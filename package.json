@@ -1,0 +1,14 @@
+{
+  "name": "demo-amazon-ses-alternative",
+  "version": "1.0.0",
+  "description": "Receive inbound email as parsed JSON with a zero-dependency Node webhook — the MailKite side of the Amazon SES comparison",
+  "type": "module",
+  "license": "MIT",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node server.mjs",
+    "dev": "node server.mjs",
+    "test": "NODE_ENV=test node --test",
+    "fire-sample-event": "node fire-sample-event.mjs"
+  }
+}

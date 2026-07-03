@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: demo-amazon-ses-alternative
+    runtime: node
+    plan: free
+    buildCommand: "true"
+    startCommand: node server.mjs
+    envVars:
+      - key: MAILKITE_WEBHOOK_SECRET
+        sync: false
