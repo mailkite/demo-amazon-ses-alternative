@@ -27,7 +27,7 @@ const event = {
 };
 
 const rawBody = JSON.stringify(event);
-const t = Math.floor(Date.now() / 1000);
+const t = Date.now(); // milliseconds — same unit MailKite's delivery worker signs with
 const v1 = createHmac("sha256", SECRET).update(`${t}.${rawBody}`).digest("hex");
 
 const res = await fetch(URL, {

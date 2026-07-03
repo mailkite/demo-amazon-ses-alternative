@@ -1,24 +1,12 @@
-// MailKite inbound webhook receiver — zero dependencies, Node 18+.
-// Verifies the `x-mailkite-signature` header (t=<unix>,v1=<hmac-sha256 hex over "<t>.<rawBody>">)
-// and logs the parsed fields of the inbound email. This is the ENTIRE receiving
-// pipeline; the SES equivalent is in ./ses-contrast/.
+// MailKite inbound webhook receiver — the SDK does the fiddly part.
+// `MailKite.verifyWebhook` checks the HMAC-SHA256 signature, replay window, and does a
+// constant-time compare in one call. The no-dependency version of this file (hand-rolled
+// verification, for contrast) is ./raw-server.mjs.
 import { createServer } from "node:http";
-import { createHmac, timingSafeEqual } from "node:crypto";
+import { MailKite } from "mailkite";
 
 const PORT = Number(process.env.PORT ?? 3000);
 const SECRET = process.env.MAILKITE_WEBHOOK_SECRET ?? "whsec_demo_secret";
-const TOLERANCE_S = 300; // reject signatures older than 5 minutes (replay guard)
-
-export function verifySignature(header, rawBody, secret, nowS = Math.floor(Date.now() / 1000)) {
-  const m = /^t=(\d+),v1=([0-9a-f]{64})$/.exec(header ?? "");
-  if (!m) return false;
-  const [, t, theirHex] = m;
-  if (Math.abs(nowS - Number(t)) > TOLERANCE_S) return false;
-  const ourHex = createHmac("sha256", secret).update(`${t}.${rawBody}`).digest("hex");
-  const ours = Buffer.from(ourHex, "hex");
-  const theirs = Buffer.from(theirHex, "hex");
-  return ours.length === theirs.length && timingSafeEqual(ours, theirs);
-}
 
 const server = createServer(async (req, res) => {
   if (req.method !== "POST" || req.url !== "/hooks/mailkite") {
@@ -29,12 +17,12 @@ const server = createServer(async (req, res) => {
   for await (const chunk of req) chunks.push(chunk);
   const rawBody = Buffer.concat(chunks).toString("utf8");
 
-  if (!verifySignature(req.headers["x-mailkite-signature"], rawBody, SECRET)) {
+  if (!MailKite.verifyWebhook(req.headers["x-mailkite-signature"], rawBody, SECRET)) {
     res.writeHead(401).end("invalid signature");
     return;
   }
 
-  const event = JSON.parse(rawBody);
+  const event = JSON.parse(rawBody); // already parsed email — no S3, no MIME parser
   if (event.type === "email.received") {
     console.log(`from:    ${event.from.address}`);
     console.log(`subject: ${event.subject}`);
