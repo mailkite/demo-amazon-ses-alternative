@@ -1,0 +1,5 @@
+{
+  "name": "demo-amazon-ses-alternative",
+  "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
+  "forwardPorts": [3000]
+}

@@ -10,8 +10,7 @@ signature verification and all — next to the SES pipeline it replaces
 ## Run it in one click
 
 [![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/mailkite/demo-amazon-ses-alternative?file=server.mjs)
-[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mailkite/demo-amazon-ses-alternative)
-[![Deploy on Railway](https://railway.com/button.svg)](https://railway.com/deploy?repo=https://github.com/mailkite/demo-amazon-ses-alternative)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/mailkite/demo-amazon-ses-alternative?quickstart=1)
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mailkite/demo-amazon-ses-alternative)
 
 StackBlitz runs the whole thing in your browser tab (WebContainers — real Node, no
