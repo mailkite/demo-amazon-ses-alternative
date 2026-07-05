@@ -15,30 +15,39 @@ A zero-dependency raw variant (`raw-server.mjs`) shows what the SDK is doing for
 [![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/mailkite/demo-amazon-ses-alternative)
 
 StackBlitz runs the whole thing in your browser tab (WebContainers — real Node, no
-account needed): open it, then in the terminal run `npm start`, and in a second
-terminal `npm run fire-sample-event`.
+account needed): open it and it boots the server, self-fires a correctly signed sample
+event, and prints the round trip — zero setup, no domain.
 
-## Run it locally
+## Run it locally — one command
 
 ```sh
 git clone https://github.com/mailkite/demo-amazon-ses-alternative
 cd demo-amazon-ses-alternative
-npm install                     # one dependency: mailkite
-node server.mjs                 # terminal 1 → listening on :3000
-node fire-sample-event.mjs      # terminal 2 → fires a signed email.received event
+npm install     # one dependency: mailkite
+npm start       # boots the server, self-fires a signed email.received event, stays up
 ```
 
-Expected output in terminal 1:
+`npm start` prints the whole round trip — the receiver verifies the signature and reads
+the decoded message straight off the JSON (no S3 fetch, no MIME parse), and the server
+stays up for more:
 
 ```
+listening on http://localhost:3000/hooks/mailkite
+
 from:    ada@example.com
 subject: Re: invoice #1042
 auth:    spf=pass dkim=pass dmarc=pass
 text:    Looks good — approved!
 attach:  po.pdf (application/pdf, 18213 bytes) → https://api.mailkite.dev/att/…
+
+— self-fired one signed email.received event → 200 ok
+  server's still up: POST your own events to :3000/hooks/mailkite, or point real email here.
 ```
 
-Tamper with the body or the secret and the server answers `401` — try it:
+A webhook needs a public URL in production; `npm start` sidesteps that by POSTing to its
+own localhost, so the full loop runs anywhere. Want the halves separately? `npm run serve`
+runs just the server, and `npm run fire-sample-event` fires the event from another
+terminal. Tamper with the body or the secret and the server answers `401` — try it:
 `npm test` runs the five signature cases (valid, wrong secret, tampered body,
 replayed timestamp, malformed header).
 

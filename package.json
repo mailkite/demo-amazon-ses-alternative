@@ -8,8 +8,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "start": "node server.mjs",
-    "dev": "node server.mjs",
+    "start": "node demo.mjs",
+    "dev": "node demo.mjs",
+    "serve": "node server.mjs",
     "test": "NODE_ENV=test node --test",
     "fire-sample-event": "node fire-sample-event.mjs"
   },

@@ -35,6 +35,12 @@ const server = createServer(async (req, res) => {
   res.writeHead(200).end("ok"); // ack fast; do heavy work out of band
 });
 
-if (process.env.NODE_ENV !== "test") {
+// Auto-listen only when run directly (`node server.mjs`), not when imported by
+// demo.mjs — importing the server must not also bind the port.
+import { fileURLToPath } from "node:url";
+const isMain = process.argv[1] === fileURLToPath(import.meta.url);
+if (isMain && process.env.NODE_ENV !== "test") {
   server.listen(PORT, () => console.log(`listening on http://localhost:${PORT}/hooks/mailkite`));
 }
+
+export { server };
